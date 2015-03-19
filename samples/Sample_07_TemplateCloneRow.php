@@ -53,6 +53,11 @@ $templateProcessor->setValue('userFirstName#3', htmlspecialchars('Michael'));
 $templateProcessor->setValue('userName#3', htmlspecialchars('Ray'));
 $templateProcessor->setValue('userPhone#3', htmlspecialchars('+1 428 889 775'));
 
+// image
+$templateProcessor->setImage("imgPhpWord", "resources/PhpWord.png", "log.png",30,30);
+$templateProcessor->setImage("logo", "resources/PhpWord.png", "logoHeader.png",30,30);
+$templateProcessor->setImage("mars", "resources/_mars.jpg", "mars.jpg",147,141);
+
 echo date('H:i:s'), ' Saving the result document...', EOL;
 $templateProcessor->saveAs('results/Sample_07_TemplateCloneRow.docx');
 
