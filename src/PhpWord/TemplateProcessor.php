@@ -122,6 +122,9 @@ class TemplateProcessor {
 	$this->temporaryWordRelDocumentPart = $this->zipClass->getFromName('word/_rels/document.xml.rels');
 
 	$this->temporaryContentType = $this->zipClass->getFromName('[Content_Types].xml');
+
+	// clean the temporary document 
+	$this->cleanTemporaryDocument();
     }
 
     /**
@@ -153,6 +156,37 @@ class TemplateProcessor {
 	}
 
 	$this->temporaryDocumentMainPart = $xmlTransformed;
+    }
+
+    /**
+     *  Clean the temporary document so that you can use getVariables
+     */
+    protected function cleanTemporaryDocument() {
+	foreach ($this->temporaryDocumentHeaders as $index => $headerXML) {
+	    $this->temporaryDocumentHeaders[$index] = $this->cleanTemporaryDocumentForPart($this->temporaryDocumentHeaders[$index]);
+	}
+
+	$this->temporaryDocumentMainPart = $this->cleanTemporaryDocumentForPart($this->temporaryDocumentMainPart);
+
+	foreach ($this->temporaryDocumentFooters as $index => $headerXML) {
+	    $this->temporaryDocumentFooters[$index] = $this->cleanTemporaryDocumentForPart($this->temporaryDocumentFooters[$index]);
+	}
+    }
+
+    /**
+     * Clean a part of the document so that you can use getVariables
+     * @param string $documentPartXML
+     */
+    protected function cleanTemporaryDocumentForPart($documentPartXML) {
+	$pattern = '|\$\{([^\}]+)\}|U';
+	preg_match_all($pattern, $documentPartXML, $matches);
+	foreach ($matches[0] as $value) {
+	    $valueCleaned = preg_replace('/<[^>]+>/', '', $value);
+	    $valueCleaned = preg_replace('/<\/[^>]+>/', '', $valueCleaned);
+	    $documentPartXML = str_replace($value, $valueCleaned, $documentPartXML);
+	}
+
+	return $documentPartXML;
     }
 
     /**
@@ -400,14 +434,6 @@ class TemplateProcessor {
      * @return string
      */
     protected function setValueForPart($documentPartXML, $search, $replace, $limit) {
-	$pattern = '|\$\{([^\}]+)\}|U';
-	preg_match_all($pattern, $documentPartXML, $matches);
-	foreach ($matches[0] as $value) {
-	    $valueCleaned = preg_replace('/<[^>]+>/', '', $value);
-	    $valueCleaned = preg_replace('/<\/[^>]+>/', '', $valueCleaned);
-	    $documentPartXML = str_replace($value, $valueCleaned, $documentPartXML);
-	}
-
 	if (substr($search, 0, 2) !== '${' && substr($search, -1) !== '}') {
 	    $search = '${' . $search . '}';
 	}
