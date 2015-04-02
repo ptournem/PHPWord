@@ -20,9 +20,12 @@ namespace PhpOffice\PhpWord;
 
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
+use PhpOffice\PhpWord\Exception\BlockAlreadyExistsException;
+use PhpOffice\PhpWord\Exception\VariableAlreadyExistsException;
 use PhpOffice\PhpWord\Exception\Exception;
 use PhpOffice\PhpWord\Shared\String;
 use PhpOffice\PhpWord\Shared\ZipArchive;
+use PhpOffice\PhpWord\Template\Block;
 
 class TemplateProcessor {
 
@@ -187,6 +190,25 @@ class TemplateProcessor {
 	}
 
 	return array_unique($variables);
+    }
+
+    /**
+     * Returns the block structure of the template.
+     *
+     * @return Block
+     */
+    public function getTemplateStructure() {
+	$block = $this->getBlocksForPart($this->temporaryDocumentMainPart);
+
+	foreach ($this->temporaryDocumentHeaders as $headerXML) {
+	    $block = $this->getBlocksForPart($headerXML, $block);
+	}
+
+	foreach ($this->temporaryDocumentFooters as $footerXML) {
+	    $block = $this->getBlocksForPart($footerXML, $block);
+	}
+
+	return $block;
     }
 
     /**
@@ -409,6 +431,43 @@ class TemplateProcessor {
 	preg_match_all('/\$\{(.*?)}/i', $documentPartXML, $matches);
 
 	return $matches[1];
+    }
+
+    /**
+     * Find all blocks in $documentPartXML.
+     * 
+     * @param String $documentPartXML
+     * @param \PhpOffice\PhpWord\Block $block
+     * @return \PhpOffice\PhpWord\Block
+     */
+    protected function getBlocksForPart($documentPartXML, $block = null) {
+	// verify or initialize current block
+	if ($block == null || !is_a($block, get_class(new Block()))) {
+	    $block = new Block();
+	}
+
+	// get blocks
+	preg_match_all('/\$\{([^\}]*)\}(.*?)\$\{\/\1\}/', $documentPartXML, $matchedBlocks, PREG_SET_ORDER);
+	// look over each blocks
+	foreach ($matchedBlocks as $matchedBlock) {
+	    $block->addInnerBlocks($matchedBlock[1], $this->getBlocksForPart($matchedBlock[2]));
+	}
+
+	// get variables 
+	preg_match_all('/\$\{(.*?)}/i', $documentPartXML, $matches, PREG_SET_ORDER);
+	// look over each variables 
+	foreach ($matches as $match) {
+	    // if it's a closing blockname 
+	    if (substr($match[1], 0, 1) === '/') {
+		// remove it from the variables array
+		$block->removeVariable(substr($match[1], 1));
+	    } else {
+		// add it in the variable array 
+		$block->addVariables($match[1]);
+	    }
+	}
+
+	return $block;
     }
 
     /**
