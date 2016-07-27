@@ -172,14 +172,14 @@ class TemplateProcessor
      *  Clean the temporary document so that you can use getVariables
      */
     protected function cleanTemporaryDocument() {
-	foreach ($this->temporaryDocumentHeaders as $index => $headerXML) {
-	    $this->temporaryDocumentHeaders[$index] = $this->cleanTemporaryDocumentForPart($this->temporaryDocumentHeaders[$index]);
+	foreach ($this->tempDocumentHeaders as $index => $headerXML) {
+	    $this->tempDocumentHeaders[$index] = $this->cleanTemporaryDocumentForPart($this->tempDocumentHeaders[$index]);
 	}
 
-	$this->temporaryDocumentMainPart = $this->cleanTemporaryDocumentForPart($this->temporaryDocumentMainPart);
+	$this->tempDocumentMainPart = $this->cleanTemporaryDocumentForPart($this->tempDocumentMainPart);
 
-	foreach ($this->temporaryDocumentFooters as $index => $headerXML) {
-	    $this->temporaryDocumentFooters[$index] = $this->cleanTemporaryDocumentForPart($this->temporaryDocumentFooters[$index]);
+	foreach ($this->tempDocumentFooters as $index => $headerXML) {
+	    $this->tempDocumentFooters[$index] = $this->cleanTemporaryDocumentForPart($this->tempDocumentFooters[$index]);
 	}
     }
 
@@ -245,13 +245,13 @@ class TemplateProcessor
      * @return Block
      */
     public function getTemplateStructure() {
-	$block = $this->getBlocksForPart($this->temporaryDocumentMainPart);
+	$block = $this->getBlocksForPart($this->tempDocumentMainPart);
 
-	foreach ($this->temporaryDocumentHeaders as $headerXML) {
+	foreach ($this->tempDocumentHeaders as $headerXML) {
 	    $block = $this->getBlocksForPart($headerXML, $block);
 	}
 
-	foreach ($this->temporaryDocumentFooters as $footerXML) {
+	foreach ($this->tempDocumentFooters as $footerXML) {
 	    $block = $this->getBlocksForPart($footerXML, $block);
 	}
 
