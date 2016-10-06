@@ -1,6 +1,6 @@
 {
     "name": "ptournem/phpword",
-    "description": "Fork of PHPWord - A pure PHP library for reading and writing word processing documents (DOCX, ODT, RTF, HTML, PDF) with added functionnalities for images and templatng ",
+    "description": "Fork of PHPWord - A pure PHP library for reading and writing word processing documents (DOCX, ODT, RTF, HTML, PDF) with added functionnalities for images and templating ",
     "keywords": [
         "PHP", "PhpOffice", "office", "PhpWord", "word", "template", "template processor", "reader", "writer",
         "docx", "OOXML", "OpenXML", "Office Open XML", "ISO IEC 29500", "WordprocessingML",

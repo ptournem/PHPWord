@@ -1,17 +1,23 @@
 <?php
+
 include_once 'Sample_Header.php';
 
 // Template processor instance creation
 echo date('H:i:s'), ' Creating new TemplateProcessor instance...', EOL;
 $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('resources/Sample_07_TemplateCloneRow.docx');
 
+$block = $templateProcessor->getTemplateStructure();
+echo date('H:i:s'), ' Done getting template structure...', EOL;
 // Variables on different parts of document
 $templateProcessor->setValue('weekday', htmlspecialchars(date('l'))); // On section/content
 $templateProcessor->setValue('time', htmlspecialchars(date('H:i'))); // On footer
 $templateProcessor->setValue('serverName', htmlspecialchars(realpath(__DIR__))); // On header
-
 // Simple table
 $templateProcessor->cloneRow('rowValue', 10);
+
+// clone block 
+$templateProcessor->cloneBlock('blockToday',2);
+$templateProcessor->deleteBlock('deleteBlock');
 
 $templateProcessor->setValue('rowValue#1', htmlspecialchars('Sun'));
 $templateProcessor->setValue('rowValue#2', htmlspecialchars('Mercury'));
@@ -54,14 +60,39 @@ $templateProcessor->setValue('userName#3', htmlspecialchars('Ray'));
 $templateProcessor->setValue('userPhone#3', htmlspecialchars('+1 428 889 775'));
 
 // image
-$templateProcessor->setImage("imgPhpWord", "resources/PhpWord.png", "log.png",30,30);
-$templateProcessor->setImage("logo", "resources/PhpWord.png", "logoHeader.png",30,30);
-$templateProcessor->setImage("mars", "resources/_mars.jpg", "mars.jpg",147,141);
+$templateProcessor->setImage("imgPhpWord", "resources/PhpWord.png", "log.png", 30, 30);
+$templateProcessor->setImage("logo", "resources/PhpWord.png", "logoHeader.png", 30, 30);
+$templateProcessor->setImage("mars", "resources/_mars.jpg", "mars.jpg", 147, 141);
 
 echo date('H:i:s'), ' Saving the result document...', EOL;
 $templateProcessor->saveAs('results/Sample_07_TemplateCloneRow.docx');
 
 echo getEndingNotes(array('Word2007' => 'docx'));
+
+echo "<h2>Structure du template </h2>";
+
+function displayBlock($block, $name,$level=0) {
+    if($level==0){
+	echo "<strong>$name</strong><ul>";   
+    } else {
+	echo "<li><strong>$name</strong></li><ul>";   
+    } 
+    foreach ($block->getInnerBlocks() as $keyBlock => $innerBlock) {
+	echo "<li>";
+	displayBlock($innerBlock, $keyBlock);
+	echo "</li>";
+    }
+
+    foreach ($block->getVariables() as $keyVar => $varName) {
+	echo "<li> $keyVar : $varName </li> ";
+    }
+    
+    echo "</ul>";
+}
+
+displayBlock($block, "Main");
+
+
 if (!CLI) {
     include_once 'Sample_Footer.php';
 }
