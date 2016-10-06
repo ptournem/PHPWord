@@ -92,6 +92,7 @@ function displayBlock($block, $name,$level=0) {
 
 displayBlock($block, "Main");
 
+echo "<h2>Structure JSON</h2><pre>". $block->toJson() . "</pre>";
 
 if (!CLI) {
     include_once 'Sample_Footer.php';

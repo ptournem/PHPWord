@@ -129,4 +129,44 @@ class Block {
 	return false;
     }
 
+    /**
+     * Return a json formatted string representing the block
+     * @return string
+     */
+    public function toJson($level = 0) {
+
+	// open the object structure
+	$ret = '{';
+
+	// add the variable item as an array variables
+	$ret .= '"variables":';
+	$ret .= json_encode($this->variables);
+	$ret .= ",";
+
+	// add the inner blocks item as an object
+	$ret .= '"blocks":{';
+
+	// get all block json
+	$blockJson = [];
+	foreach ($this->innerBlocks as $name => $block) {
+	    $retBlock = '"' . $name . '":';
+	    $retBlock.= $block->toJson();
+
+	    $blockJson[] = $retBlock;
+	}
+
+	// implode them with the coma as a glue so that the json string is always well formatted
+	$ret.= implode(",", $blockJson);
+	
+	// close the inner blocks item object 
+	$ret .= "}";
+
+
+	// close the main object
+	$ret .= '}';
+
+	// return the json string
+	return $ret;
+    }
+
 }
