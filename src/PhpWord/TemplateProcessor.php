@@ -48,7 +48,7 @@ class TemplateProcessor {
      *
      * @var string
      */
-    public $tempDocumentMainPart;
+    protected $tempDocumentMainPart;
 
     /**
      * Content of headers (in XML format) of the temporary document.
@@ -345,7 +345,7 @@ class TemplateProcessor {
 	$this->tempDocumentMainPart = $result;
     }
 
-    public function findBlockStart($offset) {
+    private function findBlockStart($offset) {
 	$blockStart = strrpos($this->tempDocumentMainPart, '<w:p ', ((strlen($this->tempDocumentMainPart) - $offset) * -1));
 
 	if (!$blockStart) {
@@ -677,6 +677,14 @@ class TemplateProcessor {
 	$this->setValue($search, $replace);
 
 	return true;
+    }
+    
+    /**
+     * Return the filename of the temp document used 
+     * @return String
+     */
+    public function getFilename(){
+	return $this->tempDocumentFilename;
     }
 
 }
